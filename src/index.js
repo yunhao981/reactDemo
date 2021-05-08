@@ -49,7 +49,8 @@ class Game extends React.Component {
                 squares: Array(9).fill(null),
             }],
             xIsNext: true,
-            stepNumber: 0
+            stepNumber: 0,
+            listIsAscending: true,
         };
     }
     handleClick(i) {
@@ -63,7 +64,6 @@ class Game extends React.Component {
         this.setState({
             history: history.concat([{
                 squares: squares,
-                // imporvement 1
                 last: i
             }]),
             stepNumber: history.length,
@@ -76,19 +76,25 @@ class Game extends React.Component {
             xIsNext: (step % 2) === 0,
         })
     }
+    handleSortToggle(){
+        this.setState({
+            listIsAscending: !this.state.listIsAscending
+        });
+    }
 
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
 
-        const moves = history.map((step, move) => {
+        let moves = history.map((step, move) => {
             const currentSquare = step.last;
             const col = Math.floor(currentSquare / 3);
             const row = currentSquare % 3;
             const desc = move ?
                 'Go to move #' + move + ' ' + col + ', ' + row :
                 'Go to game start';
+            
             return (
                 <li key={move}>
                     <button
@@ -98,6 +104,10 @@ class Game extends React.Component {
                 </li>
             );
         });
+
+        if (!this.state.listIsAscending) {
+            moves.reverse();
+        }
 
         let status;
         if (winner) {
@@ -115,6 +125,9 @@ class Game extends React.Component {
                 </div>
                 <div className='game-info'>
                     <div>{status}</div>
+                    <button onClick={() => this.handleSortToggle()}>
+                        {this.state.listIsAscending? 'descending' : 'ascending'}
+                    </button>
                     <ol>{moves}</ol>
                 </div>
             </div>
