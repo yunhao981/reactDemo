@@ -5,7 +5,7 @@ import './index.css';
 function Square(props) {
     return (
         <button
-            className="square"
+            className={'square' + (props.highlight?' highlight':'')}
             onClick={props.onClick}
         >
             {props.value}
@@ -19,6 +19,7 @@ class Board extends React.Component {
             <Square 
                 value={this.props.squares[i]}
                 onClick={() => this.props.onClick(i)}
+                highlight={this.props.line && this.props.line.includes(i)}
             />
         );
     }
@@ -57,7 +58,7 @@ class Game extends React.Component {
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
-        if (calculateWinner(squares) || squares[i]) {
+        if (calculateWinner(squares).winner || squares[i]) {
             return ;
         }
         squares[i] = this.state.xIsNext? 'X': 'O';
@@ -85,7 +86,8 @@ class Game extends React.Component {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winner = calculateWinner(current.squares);
+        const winner = calculateWinner(current.squares).winner;
+        const line = calculateWinner(current.squares).line;
 
         let moves = history.map((step, move) => {
             const currentSquare = step.last;
@@ -120,6 +122,7 @@ class Game extends React.Component {
                 <div className='game-board'>
                     <Board 
                         squares={current.squares}
+                        line = {line}
                         onClick={(i) => this.handleClick(i)}
                     />
                 </div>
@@ -148,10 +151,16 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {
+          winner: squares[a],
+          line: lines[i]
+      }
     }
   }
-  return null;
+  return {
+      winner: null,
+      line: null
+  };
 }
 
 ReactDOM.render(

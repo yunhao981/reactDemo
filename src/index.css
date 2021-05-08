@@ -52,3 +52,7 @@ ol, ul {
 .current-item {
     font-weight: bold;
 }
+
+.square.highlight {
+    background-color: aquamarine;
+}
